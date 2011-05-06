@@ -1,21 +1,23 @@
 package com.xinlv.domain;
 
-import org.neo4j.helpers.collection.IteratorUtil;
-import org.springframework.data.graph.neo4j.annotation.Indexed;
+import static org.springframework.data.graph.core.Direction.INCOMING;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.Set;
+
 import org.springframework.data.graph.annotation.NodeEntity;
 import org.springframework.data.graph.annotation.RelatedTo;
 import org.springframework.data.graph.annotation.RelatedToVia;
 import org.springframework.data.graph.core.Direction;
+import org.springframework.data.graph.neo4j.annotation.Indexed;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Collection;
-import java.util.Set;
 
 @NodeEntity
 public class User {
     private static final String SALT = "cewuiqwzie";
-    @Indexed(indexName = "users")
+    @Indexed
     String login;
     String name;
     String password;
@@ -24,7 +26,11 @@ public class User {
 
     public User() {
     }
-
+    
+    public User(String name) {
+    	this(name,name,"password",new Roles[] {Roles.ROLE_USER});
+    }
+    
     public User(String login, String name, String password, Roles... roles) {
         this.login = login;
         this.name = name;
@@ -36,12 +42,35 @@ public class User {
         return new Md5PasswordEncoder().encodePassword(password, SALT);
     }
 
-
-    @RelatedTo(elementClass = User.class, type = "FRIEND", direction = Direction.BOTH)
+    @RelatedTo(elementClass = User.class, type="FRIEND",direction = Direction.BOTH)
     Set<User> friends;
-
-    public void addFriend(User friend) {
+    
+    public void knows(User friend) {
         this.friends.add(friend);
+    }
+    
+    public Set<User> getFriends() {
+        return friends;
+    }
+    
+    @RelatedToVia(elementClass = ConcernTo.class, type = "CONCERN_TO")
+    Iterable<ConcernTo> concerns;
+    
+    public ConcernTo concern(User someone,Date requestDate) {
+    	ConcernTo concernTo = relateTo(someone,ConcernTo.class,"CONCERN_TO");
+    	concernTo.setRequestDate(requestDate);
+    	return concernTo;
+    }
+    
+    public Iterable<ConcernTo> getConcerns() {
+    	return concerns;
+    }
+    
+    @RelatedTo(elementClass = User.class, type = "CONCERN_TO", direction = INCOMING)
+    Set<User> concernedBy;
+    
+    public Collection<User> getConcernedBy() {
+    	return concernedBy;
     }
 
     @Override
@@ -53,9 +82,7 @@ public class User {
         return name;
     }
 
-    public Set<User> getFriends() {
-        return friends;
-    }
+
 
     public Roles[] getRole() {
         return roles;

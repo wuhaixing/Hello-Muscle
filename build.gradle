@@ -7,8 +7,7 @@ defaultTasks "build"
     apply plugin: 'project-reports'
     apply plugin: 'eclipse'
     apply plugin: 'jetty'
-    //support for aspectj
-    apply from:'file:///C:/Java/gradle-1.0-milestone-1/aspectJ.gradle'
+    apply plugin: 'aspectj'
     version = '1.0.0'
   
     springVersion = '3.0.5.RELEASE'
@@ -81,6 +80,7 @@ defaultTasks "build"
         
 	    ajc      'aspectj:aspectjtools:1.5.3'
 		compile  'aspectj:aspectjrt:1.5.3'
+		compile  'aspectj:aspectjtools:1.5.3'
 		
         testCompile     'junit:junit:4.8.1'
         testCompile     'org.easymock:easymock:3.0'

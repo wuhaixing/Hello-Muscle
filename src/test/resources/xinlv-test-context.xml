@@ -17,6 +17,6 @@ http://www.springframework.org/schema/data/graph http://www.springframework.org/
     </context:component-scan>
 	<bean id="wicketApplication" class="com.xinlv.PortalApplication"/>
     <datagraph:config storeDirectory="target/graph.db"/>
-
+    <datagraph:repositories base-package="com.xinlv.repository"/>
     <tx:annotation-driven mode="aspectj"/>
 </beans>
